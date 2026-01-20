@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "MCP Server configuration for Claude Code - connects to Docker-hosted MCP servers via mcp-proxy bridge",
+  "mcpServers": {
+    "n8n-docker": {
+      "command": "py",
+      "args": ["-3.12", "-m", "mcp_proxy", "http://localhost:3001/sse"]
+    },
+    "supabase-docker": {
+      "command": "py",
+      "args": ["-3.12", "-m", "mcp_proxy", "http://localhost:3002/sse"]
+    },
+    "github-docker": {
+      "command": "py",
+      "args": ["-3.12", "-m", "mcp_proxy", "http://localhost:3003/sse"]
+    },
+    "context7-docker": {
+      "command": "py",
+      "args": ["-3.12", "-m", "mcp_proxy", "http://localhost:3004/sse"]
+    },
+    "magic-docker": {
+      "command": "py",
+      "args": ["-3.12", "-m", "mcp_proxy", "http://localhost:3005/sse"]
+    }
+  },
+  "cli_commands": {
+    "description": "Use these commands to add MCP servers to Claude Code",
+    "commands": [
+      "claude mcp add n8n-docker -- py -3.12 -m mcp_proxy http://localhost:3001/sse",
+      "claude mcp add supabase-docker -- py -3.12 -m mcp_proxy http://localhost:3002/sse",
+      "claude mcp add github-docker -- py -3.12 -m mcp_proxy http://localhost:3003/sse",
+      "claude mcp add context7-docker -- py -3.12 -m mcp_proxy http://localhost:3004/sse",
+      "claude mcp add magic-docker -- py -3.12 -m mcp_proxy http://localhost:3005/sse"
+    ]
+  }
+}

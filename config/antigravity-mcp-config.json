@@ -1,0 +1,29 @@
+{
+  "mcpServers": {
+    "n8n-docker": {
+      "command": "py",
+      "args": ["-3.12", "-m", "mcp_proxy", "http://localhost:3001/sse"],
+      "disabled": false
+    },
+    "supabase-docker": {
+      "command": "py",
+      "args": ["-3.12", "-m", "mcp_proxy", "http://localhost:3002/sse"],
+      "disabled": false
+    },
+    "github-docker": {
+      "command": "py",
+      "args": ["-3.12", "-m", "mcp_proxy", "http://localhost:3003/sse"],
+      "disabled": false
+    },
+    "context7-docker": {
+      "command": "py",
+      "args": ["-3.12", "-m", "mcp_proxy", "http://localhost:3004/sse"],
+      "disabled": false
+    },
+    "magic-docker": {
+      "command": "py",
+      "args": ["-3.12", "-m", "mcp_proxy", "http://localhost:3005/sse"],
+      "disabled": false
+    }
+  }
+}

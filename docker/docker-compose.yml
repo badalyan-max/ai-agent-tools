@@ -1,0 +1,131 @@
+# MCP Docker Infrastructure with HTTP/SSE Transport
+# All MCP servers are exposed as HTTP endpoints via mcp-proxy
+# This allows any AI agent (Antigravity, Claude, etc.) to connect via HTTP
+
+services:
+  # ===========================================
+  # N8N MCP Server - Workflow Automation
+  # Endpoint: http://localhost:3001/sse
+  # ===========================================
+  n8n-mcp:
+    build:
+      context: .
+      dockerfile: mcp-node.Dockerfile
+    container_name: n8n-mcp-server
+    environment:
+      - N8N_API_URL=${N8N_API_URL}
+      - N8N_API_KEY=${N8N_API_KEY}
+      - MCP_MODE=stdio
+    ports:
+      - "3001:8096"
+    volumes:
+      - ./n8n-mcp-filter.js:/n8n-mcp-filter.js
+    command: >
+      --pass-environment --port=8096 --host=0.0.0.0 --allow-origin=* /usr/bin/node /n8n-mcp-filter.js
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "wget", "--spider", "-q", "http://localhost:8096/sse" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+
+  # ===========================================
+  # Supabase MCP Server - Database Access
+  # Endpoint: http://localhost:3002/sse
+  # ===========================================
+  supabase-mcp:
+    build:
+      context: .
+      dockerfile: mcp-node.Dockerfile
+    container_name: supabase-mcp-server
+    environment:
+      - SUPABASE_ACCESS_TOKEN=${SUPABASE_ACCESS_TOKEN}
+      - SUPABASE_PROJECT_REF=${SUPABASE_PROJECT_REF}
+      - SUPABASE_DB_PASSWORD=${SUPABASE_DB_PASSWORD}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+    ports:
+      - "3002:8096"
+    command: >
+      --pass-environment --port=8096 --host=0.0.0.0 --allow-origin=* -- npx @supabase/mcp-server-supabase
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "wget", "--spider", "-q", "http://localhost:8096/sse" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+
+  # ===========================================
+  # GitHub MCP Server - Repository Access
+  # Endpoint: http://localhost:3003/sse
+  # ===========================================
+  github-mcp:
+    build:
+      context: .
+      dockerfile: mcp-node.Dockerfile
+    container_name: github-mcp-server
+    environment:
+      - GITHUB_PERSONAL_ACCESS_TOKEN=${GITHUB_TOKEN}
+    ports:
+      - "3003:8096"
+    command: >
+      --pass-environment --port=8096 --host=0.0.0.0 --allow-origin=* npx @modelcontextprotocol/server-github
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "wget", "--spider", "-q", "http://localhost:8096/sse" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+
+  # ===========================================
+  # Context7 MCP Server - Code Documentation
+  # Endpoint: http://localhost:3004/sse
+  # ===========================================
+  context7-mcp:
+    build:
+      context: .
+      dockerfile: mcp-node.Dockerfile
+    container_name: context7-mcp-server
+    environment:
+      - CONTEXT7_API_KEY=${CONTEXT7_API_KEY}
+      - DEFAULT_MINIMUM_TOKENS=10000
+    ports:
+      - "3004:8096"
+    command: >
+      --pass-environment --port=8096 --host=0.0.0.0 --allow-origin=* npx @upstash/context7-mcp
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "wget", "--spider", "-q", "http://localhost:8096/sse" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+
+  # ===========================================
+  # 21st.dev Magic MCP Server - UI Components
+  # Endpoint: http://localhost:3005/sse
+  # ===========================================
+  magic-mcp:
+    build:
+      context: .
+      dockerfile: mcp-node.Dockerfile
+    container_name: magic-mcp-server
+    environment:
+      - TWENTYFIRST_API_KEY=${TWENTYFIRST_API_KEY}
+    ports:
+      - "3005:8096"
+    command: >
+      --pass-environment --port=8096 --host=0.0.0.0 --allow-origin=* npx -y @21st-dev/magic@latest
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "wget", "--spider", "-q", "http://localhost:8096/sse" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+
+networks:
+  default:
+    name: mcp-network
