@@ -46,6 +46,28 @@ cp docker/.env.example docker/.env
 | `n8n-validation-expert` | Validierungsfehler |
 | `frontend-design` | UI/Frontend Design |
 
+### Project Environments (NEU)
+
+Zentrale Verwaltung von Dependencies und verschlüsselten API-Keys für alle Projekte.
+
+| Projekt | Typ | Dependencies |
+|---------|-----|--------------|
+| CleanOS | Vite/React | 102 Pakete |
+| craft-connect-buddy | React Native/Expo | 47 Pakete |
+| Websitenerstellung | Next.js | 13 Pakete |
+
+**Setup für ein Projekt:**
+```powershell
+# Im Projektverzeichnis ausführen
+cd c:\Projekte\CleanOS
+
+# Dependencies installieren
+c:\Projekte\ai-agent-tools\setup-environment.ps1 -Project cleanOS
+
+# Mit verschlüsselten API-Keys
+c:\Projekte\ai-agent-tools\setup-environment.ps1 -Project cleanOS -DecryptEnv
+```
+
 ## Repository-Struktur
 
 ```
@@ -62,8 +84,18 @@ ai-agent-tools/
 ├── config/                       # Fertige Konfigurationen
 │   ├── antigravity-mcp-config.json
 │   └── claude-mcp-config.json
-├── setup-windows.ps1             # Windows Setup
-├── setup-linux.sh                # Linux/Mac Setup
+├── environments/                 # Projekt-Environments (NEU)
+│   ├── cleanOS/
+│   │   ├── package.json          # Dependencies
+│   │   ├── .env.example          # Template
+│   │   └── .env.enc              # Verschlüsselte Keys
+│   ├── craft-connect-buddy/
+│   ├── websitenerstellung/
+│   └── .sops.yaml                # Verschlüsselungs-Config
+├── setup-windows.ps1             # Windows Setup (MCP)
+├── setup-linux.sh                # Linux/Mac Setup (MCP)
+├── setup-environment.ps1         # Projekt-Env Setup (Windows)
+├── setup-environment.sh          # Projekt-Env Setup (Linux)
 ├── SETUP-ANTIGRAVITY.md          # Antigravity Anleitung
 ├── SETUP-CLAUDE-CODE.md          # Claude Code Anleitung
 └── CLAUDE.md                     # Agent Instructions
@@ -98,6 +130,42 @@ Die folgenden API-Keys werden benötigt (in `docker/.env`):
 ## Verwendung von anderen Projekten
 
 Nach dem Setup laufen die MCP-Server auf `localhost:3001-3005`. Du kannst sie von **jedem** Projekt aus nutzen - die Konfiguration muss nur einmal pro PC eingerichtet werden.
+
+## Verschlüsselte Secrets (SOPS + age)
+
+Die `.env` Dateien sind mit SOPS + age verschlüsselt, sodass echte API-Keys sicher im Repository gespeichert werden können.
+
+### Voraussetzungen
+```powershell
+# Windows
+winget install FiloSottile.age
+winget install Mozilla.sops
+
+# Linux/Mac
+brew install age sops
+```
+
+### Erstmaliges Setup
+```powershell
+# 1. age-Key generieren (einmalig pro PC)
+age-keygen -o $env:USERPROFILE\.config\sops\age\keys.txt
+
+# 2. Public Key notieren und zur .sops.yaml hinzufügen lassen
+```
+
+### Secrets entschlüsseln
+```powershell
+# Projekt-Setup mit Entschlüsselung
+.\setup-environment.ps1 -Project cleanOS -DecryptEnv
+
+# Oder manuell:
+sops -d environments/cleanOS/.env.enc > .env
+```
+
+### Neuen PC hinzufügen
+1. age-Key vom Haupt-PC kopieren: `~/.config/sops/age/keys.txt`
+2. Oder: Neuen Key generieren und Public Key zur `.sops.yaml` hinzufügen
+3. Alle `.env.enc` Dateien mit neuem Key neu verschlüsseln: `sops updatekeys <file>`
 
 ## Troubleshooting
 

@@ -1,0 +1,13 @@
+# SOPS Configuration for encrypted environment files
+# https://github.com/getsops/sops
+
+creation_rules:
+  # Match all .env.enc files in environment subdirectories
+  - path_regex: \.env\.enc$
+    age: >-
+      age1hw3cw9gcw8q700fltsqdn9rhrvuzhrqyk42yly7snftgshzpkpsquftt5f
+
+# To add another user/machine:
+# 1. Generate a new age key on that machine: age-keygen -o ~/.config/sops/age/keys.txt
+# 2. Add the public key to the 'age' field above (comma-separated)
+# 3. Re-encrypt all files: sops updatekeys <file>
