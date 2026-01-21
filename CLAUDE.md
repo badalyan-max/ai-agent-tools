@@ -30,6 +30,7 @@ This repository provides a centralized infrastructure for MCP (Model Context Pro
 | `n8n-node-configuration` | Node configuration patterns | When configuring complex nodes |
 | `n8n-validation-expert` | Validation error handling | When encountering validation errors |
 | `frontend-design` | UI/Frontend design | When creating web components |
+| `ui-ux-pro-max` | Design intelligence (50+ styles, 97 palettes, 57 fonts) | After frontend-design for concrete recommendations |
 
 ---
 
@@ -100,10 +101,30 @@ docker-compose up -d --build
 
 ### When Working with UI Components
 
-Use the `frontend-design` skill and the magic-mcp server (port 3005) for:
-- Creating React components
-- Searching for logos
-- Getting UI inspiration from 21st.dev
+**Available Tools:**
+
+| Tool | Purpose |
+|------|---------|
+| `frontend-design` Skill | Aesthetic direction, creative code generation |
+| `ui-ux-pro-max` Skill | Structured design data (50+ styles, 97 palettes, 57 fonts) |
+| magic-mcp (Port 3005) | 21st.dev component inspiration & logos |
+
+**ui-ux-pro-max Usage:**
+```bash
+# Full design system
+py -3.12 -X utf8 skills/ui-ux-pro-max/scripts/search.py "<keywords>" --design-system -p "Name"
+
+# Domain searches
+py -3.12 skills/ui-ux-pro-max/scripts/search.py "<query>" --domain style|color|typography|ux|landing|product
+
+# Stack-specific guidelines
+py -3.12 skills/ui-ux-pro-max/scripts/search.py "<query>" --stack react|html-tailwind|nextjs|vue
+```
+
+**21st.dev MCP Tools:**
+- `mcp__magic__21st_magic_component_inspiration` - Browse implementations
+- `mcp__magic__21st_magic_component_builder` - Generate components
+- `mcp__magic__logo_search` - Find brand logos
 
 ---
 
@@ -117,6 +138,13 @@ ai-agent-tools/
 │   ├── n8n-mcp-filter.js     # n8n MCP filter
 │   ├── .env.example          # API key template
 │   └── start.bat             # Windows quick-start
+├── environments/             # ENCRYPTED API KEYS (SOPS/age)
+│   ├── shared/               # Common APIs for all projects
+│   ├── craft-connect-buddy/  # CCB-specific keys
+│   ├── cleanOS/              # CleanOS-specific keys
+│   ├── websitenerstellung/   # DataForSEO credentials
+│   ├── docker-mcp/           # MCP server configuration
+│   └── .sops.yaml            # SOPS encryption config
 ├── skills/
 │   ├── n8n-mcp-tools-expert/
 │   ├── n8n-workflow-patterns/
@@ -125,7 +153,8 @@ ai-agent-tools/
 │   ├── n8n-expression-syntax/
 │   ├── n8n-node-configuration/
 │   ├── n8n-validation-expert/
-│   └── frontend-design/
+│   ├── frontend-design/
+│   └── ui-ux-pro-max/        # 50+ styles, 97 palettes, 57 fonts
 ├── config/
 │   ├── antigravity-mcp-config.json
 │   └── claude-mcp-config.json
@@ -136,6 +165,66 @@ ai-agent-tools/
 ├── SETUP-CLAUDE-CODE.md      # Claude Code setup guide
 └── CLAUDE.md                 # This file
 ```
+
+---
+
+## API Keys & Secrets Management
+
+All API keys are stored **encrypted** in the `environments/` folder using SOPS with age encryption.
+
+### Available API Keys
+
+| File | Contains |
+|------|----------|
+| `environments/shared/.env.enc` | OpenAI (2x), Gemini, Perplexity, Firecrawl, Brevo, GitHub, Claude OAuth, Context7, N8N, Supabase Access Token |
+| `environments/craft-connect-buddy/.env.enc` | Supabase keys (CCB project), Service Role Key |
+| `environments/cleanOS/.env.enc` | Supabase keys (CleanOS project), Service Role Key |
+| `environments/websitenerstellung/.env.enc` | DataForSEO Login & Password |
+| `environments/docker-mcp/.env.enc` | MCP server configuration (N8N, Supabase, Context7, GitHub) |
+
+### Decrypting API Keys
+
+**Prerequisites:**
+- SOPS installed (`winget install Mozilla.SOPS` on Windows)
+- Age key file at `~/.config/sops/age/keys.txt`
+
+**Commands:**
+```bash
+# Set the key file (Git Bash / Linux)
+export SOPS_AGE_KEY_FILE="$HOME/.config/sops/age/keys.txt"
+
+# Windows (PowerShell) - key location
+# C:\Users\<username>\.config\sops\age\keys.txt
+
+# Decrypt and view a file
+sops -d --output-type dotenv environments/shared/.env.enc
+
+# Decrypt specific project
+sops -d --output-type dotenv environments/craft-connect-buddy/.env.enc
+sops -d --output-type dotenv environments/websitenerstellung/.env.enc
+```
+
+### Adding New Keys
+
+1. Decrypt the file: `sops -d --output-type dotenv environments/shared/.env.enc > temp.env`
+2. Edit `temp.env` and add your keys
+3. Re-encrypt: `sops --config /dev/null --age "age1hw3cw9gcw8q700fltsqdn9rhrvuzhrqyk42yly7snftgshzpkpsquftt5f" --encrypt --input-type dotenv --output-type json temp.env > environments/shared/.env.enc`
+4. Delete temp file: `rm temp.env`
+
+### Key Locations Quick Reference
+
+| API | Location |
+|-----|----------|
+| OpenAI | `shared/.env.enc` → `OPENAI_API_KEY` |
+| Gemini | `shared/.env.enc` → `GEMINI_API_KEY` |
+| Perplexity | `shared/.env.enc` → `PERPLEXITY_API_KEY` |
+| Firecrawl | `shared/.env.enc` → `FIRECRAWL_API_KEY` |
+| Brevo | `shared/.env.enc` → `BREVO_API_KEY` |
+| DataForSEO | `websitenerstellung/.env.enc` → `DATAFORSEO_LOGIN`, `DATAFORSEO_PASSWORD` |
+| GitHub | `shared/.env.enc` → `GITHUB_TOKEN` |
+| N8N | `shared/.env.enc` → `N8N_API_URL`, `N8N_API_KEY` |
+| Supabase (CCB) | `craft-connect-buddy/.env.enc` |
+| Supabase (CleanOS) | `cleanOS/.env.enc` |
 
 ---
 
