@@ -7,6 +7,9 @@
       "Bash(docker logs:*)",
       "Bash(dir \"c:\\\\KI-Projekte\"\")",
       "Bash(ls:*)"
+    ],
+    "additionalDirectories": [
+      "c:\\Projekte\\ai-agent-tools\\temp-ui-ux-pro-max\\.claude\\skills\\ui-ux-pro-max\\scripts"
     ]
   }
 }
