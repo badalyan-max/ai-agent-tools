@@ -2,8 +2,8 @@
 # https://github.com/getsops/sops
 
 creation_rules:
-  # Match all .env.enc files in environment subdirectories
-  - path_regex: \.env\.enc$
+  # Match all .env and .env.enc files in environment subdirectories
+  - path_regex: \.env(\.enc)?$
     age: >-
       age1hw3cw9gcw8q700fltsqdn9rhrvuzhrqyk42yly7snftgshzpkpsquftt5f
 
