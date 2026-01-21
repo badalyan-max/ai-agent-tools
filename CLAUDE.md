@@ -163,3 +163,105 @@ Use `py -3.12` instead of `python`. Python 3.14 has known issues with mcp-proxy.
 ### API key errors
 1. Check `docker/.env` has all required keys
 2. Restart affected container: `docker-compose restart n8n-mcp`
+
+---
+
+## Using MCP Servers from Other Projects
+
+This repository provides **centralized MCP infrastructure** that can be used by any project. Other projects (like `n8n-automations`) should use these Docker-hosted MCP servers instead of running their own.
+
+### How It Works
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│              Your Project (e.g., n8n-automations)           │
+│                        Claude Code                          │
+└────────────────────────┬────────────────────────────────────┘
+                         │
+                         ▼
+┌─────────────────────────────────────────────────────────────┐
+│  mcp-proxy (Python bridge on your machine)                  │
+│  Command: py -3.12 -m mcp_proxy http://localhost:PORT/sse   │
+└────────────────────────┬────────────────────────────────────┘
+                         │
+                         ▼
+┌─────────────────────────────────────────────────────────────┐
+│         ai-agent-tools Docker Containers                    │
+│    (localhost:3001-3005 - centralized infrastructure)       │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Step 1: Ensure Docker Containers Are Running
+
+From the `ai-agent-tools` directory:
+
+```powershell
+# Windows
+cd c:\KI-Projekte\ai-agent-tools\docker
+docker-compose up -d --build
+
+# Verify containers are running
+docker-compose ps
+```
+
+### Step 2: Configure Claude Code MCP Servers
+
+Run these commands **once** to add MCP servers to Claude Code:
+
+```bash
+claude mcp add n8n-docker -- py -3.12 -m mcp_proxy http://localhost:3001/sse
+claude mcp add supabase-docker -- py -3.12 -m mcp_proxy http://localhost:3002/sse
+claude mcp add github-docker -- py -3.12 -m mcp_proxy http://localhost:3003/sse
+claude mcp add context7-docker -- py -3.12 -m mcp_proxy http://localhost:3004/sse
+claude mcp add magic-docker -- py -3.12 -m mcp_proxy http://localhost:3005/sse
+```
+
+**Alternative: Manual JSON configuration** in `~/.claude/settings.local.json`:
+
+```json
+{
+  "mcpServers": {
+    "n8n-docker": {
+      "command": "py",
+      "args": ["-3.12", "-m", "mcp_proxy", "http://localhost:3001/sse"]
+    },
+    "supabase-docker": {
+      "command": "py",
+      "args": ["-3.12", "-m", "mcp_proxy", "http://localhost:3002/sse"]
+    },
+    "github-docker": {
+      "command": "py",
+      "args": ["-3.12", "-m", "mcp_proxy", "http://localhost:3003/sse"]
+    },
+    "context7-docker": {
+      "command": "py",
+      "args": ["-3.12", "-m", "mcp_proxy", "http://localhost:3004/sse"]
+    },
+    "magic-docker": {
+      "command": "py",
+      "args": ["-3.12", "-m", "mcp_proxy", "http://localhost:3005/sse"]
+    }
+  }
+}
+```
+
+### Step 3: Verify Connection
+
+1. Restart Claude Code
+2. Type `/mcp` to see all connected servers
+3. You should see 5 Docker-based MCP servers listed
+4. Test with `n8n_health_check` tool
+
+### Projects Using This Infrastructure
+
+| Project | Location | Status |
+|---------|----------|--------|
+| ai-agent-tools | `c:\KI-Projekte\ai-agent-tools\` | Source (this repo) |
+| n8n-automations | `c:\KI-Projekte\n8n automations\n8n-automations\` | Consumer |
+
+### Important Notes
+
+- **Single source of truth**: Only run Docker containers from ai-agent-tools
+- **Port conflicts**: Do NOT run duplicate docker-compose files from other projects
+- **API keys**: All API keys are configured in `ai-agent-tools/docker/.env`
+- **Skills**: Shared via symlink to `ai-agent-tools/skills/`

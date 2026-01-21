@@ -1,0 +1,22 @@
+# Secrets - NIEMALS committen wenn public!
+SECRETS.md
+
+# Environment files
+docker/.env
+.env
+.env.local
+.env.*.local
+
+# Decrypted secrets
+environments/*/.env
+!environments/*/.env.example
+!environments/*/.env.enc
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
