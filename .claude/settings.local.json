@@ -10,6 +10,9 @@
     ],
     "additionalDirectories": [
       "c:\\Projekte\\ai-agent-tools\\temp-ui-ux-pro-max\\.claude\\skills\\ui-ux-pro-max\\scripts"
+    ],
+    "allow": [
+      "Bash(dir /b \"C:\\\\Projekte\")"
     ]
   }
 }
