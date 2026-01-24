@@ -1,18 +1,14 @@
 {
   "permissions": {
     "allow": [
-      "Bash(docker-compose down:*)",
-      "Bash(docker-compose up:*)",
-      "Bash(curl:*)",
-      "Bash(docker logs:*)",
-      "Bash(dir \"c:\\\\KI-Projekte\"\")",
-      "Bash(ls:*)"
+      "Bash(dir /b \"C:\\\\Projekte\")",
+      "Bash(SOPS_AGE_KEY_FILE=\"$HOME/.config/sops/age/keys.txt\" sops -d --output-type dotenv:*)",
+      "Bash(docker-compose:*)",
+      "Bash(docker ps:*)",
+      "mcp__n8n-mcp__n8n_list_workflows"
     ],
     "additionalDirectories": [
       "c:\\Projekte\\ai-agent-tools\\temp-ui-ux-pro-max\\.claude\\skills\\ui-ux-pro-max\\scripts"
-    ],
-    "allow": [
-      "Bash(dir /b \"C:\\\\Projekte\")"
     ]
   }
 }
